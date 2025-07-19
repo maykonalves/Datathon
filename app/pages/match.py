@@ -53,12 +53,38 @@ def carregar_recursos_do_modelo():
             st.stop()
             
     try:
+        # Primeira tentativa: carregar modelo normalmente
         nlp = spacy.load("pt_core_news_sm", disable=["parser", "ner"])
     except OSError:
-        st.warning("Modelo spaCy 'pt_core_news_sm' não encontrado. Baixando...")
-        from spacy.cli import download
-        download("pt_core_news_sm")
-        nlp = spacy.load("pt_core_news_sm", disable=["parser", "ner"])
+        try:
+            # Segunda tentativa: carregar modelo pelo nome do pacote
+            import pt_core_news_sm
+            nlp = pt_core_news_sm.load(disable=["parser", "ner"])
+        except (ImportError, OSError):
+            try:
+                # Terceira tentativa: download programático (pode falhar em produção)
+                st.warning("⚠️ Tentando baixar modelo spaCy português...")
+                import subprocess
+                import sys
+                result = subprocess.run([
+                    sys.executable, "-m", "spacy", "download", "pt_core_news_sm"
+                ], capture_output=True, text=True)
+                
+                if result.returncode == 0:
+                    nlp = spacy.load("pt_core_news_sm", disable=["parser", "ner"])
+                else:
+                    raise OSError("Falha no download do modelo")
+            except Exception as e:
+                # Fallback: usar modelo de linguagem básico
+                st.warning(f"⚠️ Não foi possível carregar o modelo spaCy português. Usando processamento básico. Erro: {str(e)}")
+                try:
+                    # Tentar modelo em inglês como fallback
+                    nlp = spacy.load("en_core_web_sm", disable=["parser", "ner"])
+                    st.info("✅ Usando modelo spaCy em inglês como fallback.")
+                except OSError:
+                    # Último recurso: modelo vazio
+                    nlp = spacy.blank("pt")
+                    st.warning("⚠️ Usando modelo spaCy básico sem recursos avançados.")
 
     return loaded_models, manifest, nlp
 

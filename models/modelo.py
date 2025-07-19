@@ -24,12 +24,35 @@ import matplotlib.pyplot as plt
 # (Esta seção permanece inalterada)
 nltk.download('stopwords', quiet=True)
 STOPWORDS_PT = set(stopwords.words('portuguese'))
-try:
-    nlp = spacy.load("pt_core_news_sm", disable=["parser", "ner"])
-except OSError:
-    from spacy.cli import download
-    download("pt_core_news_sm")
-    nlp = spacy.load("pt_core_news_sm", disable=["parser", "ner"])
+
+def carregar_modelo_spacy():
+    """Carrega o modelo spaCy com fallbacks robustos para produção"""
+    try:
+        # Primeira tentativa: carregar modelo normalmente
+        return spacy.load("pt_core_news_sm", disable=["parser", "ner"])
+    except OSError:
+        try:
+            # Segunda tentativa: carregar modelo pelo nome do pacote
+            import pt_core_news_sm
+            return pt_core_news_sm.load(disable=["parser", "ner"])
+        except (ImportError, OSError):
+            try:
+                # Terceira tentativa: download programático
+                print("Tentando baixar modelo spaCy português...")
+                from spacy.cli import download
+                download("pt_core_news_sm")
+                return spacy.load("pt_core_news_sm", disable=["parser", "ner"])
+            except Exception as e:
+                # Fallback: usar modelo básico
+                print(f"Aviso: Não foi possível carregar modelo spaCy português. Usando modelo básico. Erro: {e}")
+                try:
+                    # Tentar modelo em inglês como fallback
+                    return spacy.load("en_core_web_sm", disable=["parser", "ner"])
+                except OSError:
+                    # Último recurso: modelo vazio
+                    return spacy.blank("pt")
+
+nlp = carregar_modelo_spacy()
 
 class ModelConfig:
     PROCESSED_DATA_PATH = './'

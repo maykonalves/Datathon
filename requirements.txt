@@ -14,6 +14,9 @@ joblib>=1.3.0
 spacy>=3.7.0
 nltk>=3.8.0
 
+# Modelo spaCy português (instalação direta)
+https://github.com/explosion/spacy-models/releases/download/pt_core_news_sm-3.8.0/pt_core_news_sm-3.8.0-py3-none-any.whl
+
 # Interpretabilidade e Visualização
 shap>=0.43.0
 matplotlib>=3.7.0

@@ -146,9 +146,6 @@ Thumbs.db
 *.joblib
 *.model
 
-# Streamlit
-.streamlit/
-
 # Logs
 logs/
 *.log

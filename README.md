@@ -2,9 +2,38 @@
 
 ![Python](https://img.shields.io/badge/python-v3.12+-blue.svg)
 ![Streamlit](https://img.shields.io/badge/streamlit-1.46.1-red.svg)
-![Docker](https://img.shields.io/badge/docker-ready-blue.svg)
+![Docker](https://img.shields.io/badge/docker-ready-blue.sv## 🔍 Troubleshooting
 
-## Descrição
+### Problemas Comuns
+
+1. **Modelo spaCy não encontrado:**
+   ```bash
+   python -m spacy download pt_core_news_sm
+   ```
+
+2. **Erro de modelos não encontrados:**
+   - Execute `python models/modelo.py` para treinar os modelos
+
+3. **Problemas de dependências:**
+   - Verifique se está usando Python 3.12+
+   - Reinstale as dependências: `pip install -r requirements.txt --force-reinstall`
+
+### Problemas de Deploy no Streamlit Cloud
+
+4. **Erro de permissão ao instalar spaCy (OSError: [Errno 13]):**
+   - O modelo spaCy agora está incluído diretamente no `requirements.txt`
+   - Se o problema persistir, o sistema usa automaticamente um modelo fallback
+   - Verifique se o arquivo `packages.txt` está presente no repositório
+
+5. **Aplicação não carrega completamente:**
+   - Verifique os logs do Streamlit Cloud
+   - Certifique-se de que todos os arquivos necessários estão no repositório
+   - Verifique se o caminho do arquivo principal está correto: `app/main.py`
+
+6. **Modelos de ML não encontrados:**
+   - Execute `python models/modelo.py` localmente antes do deploy
+   - Certifique-se de que os arquivos `.pkl` estão sendo gerados
+   - Verifique se o `.gitignore` não está excluindo os modelos necessárioso
 
 O **Decision** é uma aplicação inteligente de recrutamento que utiliza Machine Learning para fazer matching entre candidatos e vagas de emprego. O sistema possui modelos especializados por tecnologia (Python, Java, SQL, AWS, Azure, SAP, React, Oracle) e um modelo geral como fallback, proporcionando alta precisão na recomendação de candidatos.
 
@@ -132,7 +161,32 @@ docker build -t decision-app .
 docker run -p 8501:8501 decision-app
 ```
 
-A aplicação estará disponível em `http://localhost:8501`
+### Deploy no Streamlit Cloud
+
+Para fazer deploy no Streamlit Cloud, siga estes passos:
+
+1. **Fork/Clone este repositório no GitHub**
+
+2. **Acesse [share.streamlit.io](https://share.streamlit.io)**
+
+3. **Configure o deploy:**
+   - Repository: `seu-usuario/Datathon`
+   - Branch: `main`
+   - Main file path: `app/main.py`
+
+4. **Arquivos importantes para o deploy:**
+   - `requirements.txt` - Dependências Python
+   - `packages.txt` - Dependências do sistema
+   - `.streamlit/config.toml` - Configuração do Streamlit
+
+5. **O sistema irá automaticamente:**
+   - Instalar todas as dependências
+   - Baixar o modelo spaCy português
+   - Configurar o ambiente de produção
+
+**Nota:** O modelo spaCy está incluído diretamente no `requirements.txt` para evitar problemas de permissão durante o deploy.
+
+A aplicação estará disponível em `http://localhost:8501` (local) ou na URL fornecida pelo Streamlit Cloud.
 
 ## Como Usar
 
