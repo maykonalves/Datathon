@@ -1,73 +1,237 @@
-# Co-Piloto de Recrutamento IA - Datathon Decision
+# Decision - Co-Piloto de Recrutamento
 
-## Resumo do Projeto
+![Python](https://img.shields.io/badge/python-v3.12+-blue.svg)
+![Streamlit](https://img.shields.io/badge/streamlit-1.46.1-red.svg)
+![Docker](https://img.shields.io/badge/docker-ready-blue.svg)
 
-Este projeto foi desenvolvido como solução para o Datathon Data Analytics da Decision. Trata-se de uma aplicação web, construída com **Streamlit** e conteinerizada com **Docker**, que atua como um "Co-Piloto de Recrutamento". A ferramenta de IA é focada em duas frentes: a **priorização estratégica de candidatos** para vagas abertas e a **descoberta de perfis de sucesso** com base em dados históricos, visando tornar o processo de seleção mais rápido, assertivo e data-driven.
+## Descrição
 
-## O Desafio
+O **Decision** é uma aplicação inteligente de recrutamento que utiliza Machine Learning para fazer matching entre candidatos e vagas de emprego. O sistema possui modelos especializados por tecnologia (Python, Java, SQL, AWS, Azure, SAP, React, Oracle) e um modelo geral como fallback, proporcionando alta precisão na recomendação de candidatos.
 
-O processo de recrutamento da Decision, embora robusto, enfrenta desafios de eficiência e escalabilidade. As principais dores identificadas foram:
+Desenvolvido como solução para o Datathon Data Analytics da Decision, esta ferramenta de IA é focada em duas frentes: a **priorização estratégica de candidatos** para vagas abertas e a **descoberta de perfis de sucesso** com base em dados históricos, visando tornar o processo de seleção mais rápido, assertivo e data-driven.
 
-* **Busca Manual e Demorada:** Encontrar o candidato ideal em diversas plataformas consome um tempo valioso.
-* **Falta de Padronização:** A ausência de um padrão em entrevistas pode levar à perda de informações cruciais sobre os candidatos.
-* **Dificuldade de Análise:** Avaliar o "match" técnico e o engajamento real de centenas de candidatos para uma vaga é um processo complexo e suscetível a vieses.
+## Funcionalidades
 
-## A Solução Proposta
-
-Nossa solução é uma plataforma de IA que empodera os recrutadores com insights e recomendações inteligentes através de duas funcionalidades principais.
-
-### Funcionalidades Principais
-
-#### 1. Matriz de Priorização de Talentos
-
-Esta é a funcionalidade central da aplicação. Em vez de um simples ranking, ela oferece uma análise estratégica bidimensional para cada candidato em relação a uma vaga, utilizando dois modelos preditivos distintos:
-
-* **Score de Compatibilidade Técnica (Modelo 1):** Prevê o quão bem as habilidades e a experiência de um candidato se alinham aos requisitos da vaga. Responde à pergunta: "Este candidato **pode** fazer o trabalho?".
-* **Score de Previsão de Aceite (Modelo 2):** Prevê a probabilidade de um candidato aceitar uma proposta caso ela seja oferecida, medindo seu engajamento e interesse. Responde à pergunta: "Este candidato **quer** este trabalho?".
-
-Esses dois scores posicionam cada candidato em uma **Matriz de Talentos 2x2**, segmentando-os em quatro quadrantes estratégicos:
-* **Melhores candidatos (Técnico Alto / Aceite Alto):** Prioridade máxima.
-* **Talentos em Risco (Técnico Alto / Aceite Baixo):** Requerem uma abordagem consultiva para garantir o aceite.
-* **Potenciais a Desenvolver (Técnico Baixo / Aceite Alto):** Ótimos para vagas flexíveis ou com treinamento.
-* **Baixa Prioridade (Técnico Baixo / Aceite Baixo):** Devem ser despriorizados para a vaga atual.
-
-A funcionalidade também conta com **IA Explicável (XAI)**, usando a biblioteca `SHAP` para detalhar os fatores que mais influenciaram ambos os scores, garantindo total transparência.
-
-#### 2. Análise de Perfis de Sucesso
-
-Esta funcionalidade utiliza **aprendizagem não-supervisionada (Clustering)** para analisar os dados históricos de todos os candidatos já contratados pela Decision.
-
-* **Descoberta de Personas:** O modelo agrupa os candidatos de sucesso em clusters, revelando "personas" ou perfis ideais que a empresa consegue atrair e contratar com eficiência (ex: "Especialistas SAP Sênior bilíngues", "Desenvolvedores Java Pleno para o setor financeiro").
-* **Padronização e Estratégia:** Ajuda a empresa a entender seus nichos de mercado, a padronizar o que constitui um "candidato de sucesso" e a guiar a busca ativa por novos talentos de forma mais estratégica.
-
----
+- **Matching Inteligente**: Algoritmos de ML especializados por área de tecnologia
+- **Análise Semântica**: Processamento de linguagem natural para análise de currículos e descrições de vagas
+- **Modelos Especializados**: 8 modelos específicos para diferentes tecnologias
+- **Interface Streamlit**: Interface web intuitiva e responsiva
+- **SHAP Explainability**: Visualizações de interpretabilidade dos modelos
+- **Containerização Docker**: Deploy simplificado
 
 ## Arquitetura do Projeto
 
-O projeto segue uma arquitetura modular para garantir a separação de conceitos entre a lógica da aplicação (backend) e a interface do usuário (frontend).
+```
+Datathon/
+├── app/                        # Aplicação Streamlit
+│   ├── main.py                 # Ponto de entrada principal
+│   └── pages/
+│       ├── match.py           # Página de matching
+│       └── sobre.py           # Página sobre o projeto
+├── data/                      # Dados do projeto
+│   ├── raw/                   # Dados brutos
+│   │   ├── applicants.json    # Dados dos candidatos
+│   │   ├── jobs.json          # Dados das vagas
+│   │   └── prospects.json     # Dados de prospects
+│   └── processed/             # Dados processados
+├── models/                    # Modelos de Machine Learning
+│   ├── modelo_*.pkl           # Modelos especializados por tecnologia
+│   ├── modelo.py              # Script de treinamento
+│   ├── models_manifest.json   # Manifesto dos modelos
+│   └── shap_summary_*.png     # Visualizações SHAP
+├── notebooks/                 # Análises exploratórias
+│   ├── eda_applicants.ipynb   # EDA dos candidatos
+│   ├── eda_jobs.ipynb         # EDA das vagas
+│   └── eda_prospects.ipynb    # EDA dos prospects
+├── src/                       # Código fonte adicional
+├── Dockerfile                 # Configuração Docker
+├── requirements.txt           # Dependências Python
+└── README.md                  # Este arquivo
+```
 
-```text
-recruitment_ai_datathon/
-│
-├── app/                  # Frontend (Streamlit)
-│   ├── pages/            # Páginas da aplicação
-│   └── main.py           # Página de configuração do streamlit
-│
-├── data/
-│   ├── raw/              # Dados brutos .json
-│   └── processed/        # Dados processados e unificados
-│
-├── models/               # Modelos de ML e pré-processadores salvos (.pkl)
-│
-├── notebooks/            # Notebooks para Análise Exploratória (EDA)
-│
-├── src/                  # Backend e lógica de negócio
-│   ├── data_processing.py
-│   ├── feature_engineering.py
-│   ├── model_training.py
-│   └── predictor.py
-│
-├── .gitignore
-├── Dockerfile            # Definição do contêiner da aplicação
-├── requirements.txt      # Dependências Python
-└── README.md
+## Modelos Especializados
+
+O sistema conta com os seguintes modelos especializados:
+
+1. **Python** - Para vagas relacionadas a Python, Django, Flask, Data Science
+2. **Java** - Para vagas relacionadas a Java, Spring, Hibernate
+3. **SQL** - Para vagas relacionadas a bancos de dados e SQL
+4. **AWS** - Para vagas relacionadas a Amazon Web Services
+5. **Azure** - Para vagas relacionadas a Microsoft Azure
+6. **SAP** - Para vagas relacionadas a sistemas SAP
+7. **React** - Para vagas relacionadas a React e frontend
+8. **Oracle** - Para vagas relacionadas a tecnologias Oracle
+9. **General** - Modelo fallback para outras tecnologias
+
+## Tecnologias Utilizadas
+
+- **Python 3.12+**
+- **Streamlit** - Interface web
+- **XGBoost** - Algoritmo de Machine Learning
+- **spaCy** - Processamento de linguagem natural
+- **NLTK** - Toolkit de linguagem natural
+- **SHAP** - Explicabilidade dos modelos
+- **Pandas/NumPy** - Manipulação de dados
+- **Scikit-learn** - Ferramentas de ML
+- **Docker** - Containerização
+
+## Instalação e Configuração
+
+### Pré-requisitos
+
+- Python 3.12 ou superior
+- Docker (opcional)
+- Git
+
+### Instalação Local
+
+1. **Clone o repositório:**
+```bash
+git clone https://github.com/maykonalves/Datathon.git
+cd Datathon
+```
+
+2. **Crie um ambiente virtual:**
+```bash
+python -m venv venv
+source venv/bin/activate  # Linux/Mac
+# ou
+venv\Scripts\activate     # Windows
+```
+
+3. **Instale as dependências:**
+```bash
+pip install -r requirements.txt
+```
+
+4. **Baixe o modelo spaCy em português:**
+```bash
+python -m spacy download pt_core_news_sm
+```
+
+5. **Execute o treinamento dos modelos (se necessário):**
+```bash
+cd models
+python modelo.py
+```
+
+6. **Execute a aplicação:**
+```bash
+streamlit run app/main.py
+```
+
+### Instalação com Docker
+
+1. **Build da imagem:**
+```bash
+docker build -t decision-app .
+```
+
+2. **Execute o container:**
+```bash
+docker run -p 8501:8501 decision-app
+```
+
+A aplicação estará disponível em `http://localhost:8501`
+
+## Como Usar
+
+### Página de Match
+
+1. Acesse a aplicação no navegador
+2. Navegue para "Match perfil"
+3. Selecione uma vaga disponível no sistema
+4. O sistema irá:
+   - Identificar automaticamente a tecnologia principal da vaga
+   - Selecionar o modelo especializado apropriado
+   - Calcular scores de matching para todos os candidatos
+   - Exibir os candidatos ranqueados por compatibilidade
+
+### Interpretação dos Resultados
+
+- **Score de Match**: Probabilidade de sucesso (0-100%)
+- **Modelo Utilizado**: Qual modelo especializado foi aplicado
+- **Features Principais**: Principais fatores que influenciaram o score
+
+## Desenvolvimento e Contribuição
+
+### Estrutura do Código
+
+- `app/main.py`: Configuração principal do Streamlit
+- `app/pages/match.py`: Lógica de matching e interface
+- `models/modelo.py`: Script de treinamento dos modelos
+- `notebooks/`: Análises exploratórias e desenvolvimento
+
+### Executando os Notebooks
+
+Para executar as análises exploratórias:
+
+```bash
+jupyter lab notebooks/
+```
+
+### Retreinamento dos Modelos
+
+Para retreinar os modelos com novos dados:
+
+```bash
+cd models
+python modelo.py
+```
+
+## Métricas e Performance
+
+Os modelos são avaliados usando:
+- **Accuracy**
+- **Precision/Recall**
+- **F1-Score**
+- **Cross-validation** com StratifiedKFold
+
+Visualizações SHAP são geradas automaticamente para interpretabilidade.
+
+## Deploy
+
+### Dockerfile
+
+O projeto inclui um Dockerfile otimizado para produção:
+- Baseado em Python 3.12 slim
+- Health check integrado
+- Exposição na porta 8501
+- Configuração para servidor público
+
+### Variáveis de Ambiente
+
+Nenhuma variável de ambiente específica é necessária para execução básica.
+
+## Troubleshooting
+
+### Problemas Comuns
+
+1. **Modelo spaCy não encontrado:**
+   ```bash
+   python -m spacy download pt_core_news_sm
+   ```
+
+2. **Erro de modelos não encontrados:**
+   - Execute `python models/modelo.py` para treinar os modelos
+
+3. **Problemas de dependências:**
+   - Verifique se está usando Python 3.12+
+   - Reinstale as dependências: `pip install -r requirements.txt --force-reinstall`
+
+## Licença
+
+Este projeto está sob a licença MIT. Veja o arquivo [LICENSE](LICENSE) para mais detalhes.
+
+## Equipe
+
+Desenvolvido durante o Datathon por **Maykon Alves**.
+
+## Contato
+
+- GitHub: [@maykonalves](https://github.com/maykonalves)
+- LinkedIn: [Maykon Alves](https://linkedin.com/in/maykonalves)
+
+---
+
+**Decision** - Transformando recrutamento com Inteligência Artificial

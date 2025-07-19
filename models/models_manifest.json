@@ -1,0 +1,13 @@
+{
+    "specialist_models": [
+        "sap",
+        "java",
+        "sql",
+        "oracle",
+        "aws",
+        "react",
+        "python",
+        "azure"
+    ],
+    "fallback_model": "general"
+}

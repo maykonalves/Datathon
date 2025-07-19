@@ -1,6 +1,36 @@
+# Interface Web
 streamlit==1.46.1
-pandas
-numpy
-scikit-learn
-xgboost
-joblib
+
+# Manipulação de Dados
+pandas>=2.0.0
+numpy>=1.24.0
+
+# Machine Learning
+scikit-learn>=1.3.0
+xgboost>=2.0.0
+joblib>=1.3.0
+
+# Processamento de Linguagem Natural
+spacy>=3.7.0
+nltk>=3.8.0
+
+# Interpretabilidade e Visualização
+shap>=0.43.0
+matplotlib>=3.7.0
+seaborn>=0.12.0
+plotly>=5.15.0
+
+# Modelos de linguagem em português para spaCy
+# Para instalar manualmente: python -m spacy download pt_core_news_sm
+
+# Utilitários
+requests>=2.31.0
+python-dotenv>=1.0.0
+
+# Para desenvolvimento (opcional)
+jupyter>=1.0.0
+jupyterlab>=4.0.0
+
+# Para testes (opcional)
+pytest>=7.4.0
+pytest-cov>=4.1.0
