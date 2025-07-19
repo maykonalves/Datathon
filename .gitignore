@@ -143,7 +143,6 @@ ehthumbs.db
 Thumbs.db
 
 # Project specific - Modelos grandes
-*.pkl
 *.joblib
 *.model
 
