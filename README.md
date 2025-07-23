@@ -2,51 +2,20 @@
 
 ![Python](https://img.shields.io/badge/python-v3.12+-blue.svg)
 ![Streamlit](https://img.shields.io/badge/streamlit-1.46.1-red.svg)
-![Docker](https://img.shields.io/badge/docker-ready-blue.sv## 🔍 Troubleshooting
+![Docker](https://img.shields.io/badge/docker-ready-blue.svg)
 
-### Problemas Comuns
-
-1. **Modelo spaCy não encontrado:**
-   ```bash
-   python -m spacy download pt_core_news_sm
-   ```
-
-2. **Erro de modelos não encontrados:**
-   - Execute `python models/modelo.py` para treinar os modelos
-
-3. **Problemas de dependências:**
-   - Verifique se está usando Python 3.12+
-   - Reinstale as dependências: `pip install -r requirements.txt --force-reinstall`
-
-### Problemas de Deploy no Streamlit Cloud
-
-4. **Erro de permissão ao instalar spaCy (OSError: [Errno 13]):**
-   - O modelo spaCy agora está incluído diretamente no `requirements.txt`
-   - Se o problema persistir, o sistema usa automaticamente um modelo fallback
-   - Verifique se o arquivo `packages.txt` está presente no repositório
-
-5. **Aplicação não carrega completamente:**
-   - Verifique os logs do Streamlit Cloud
-   - Certifique-se de que todos os arquivos necessários estão no repositório
-   - Verifique se o caminho do arquivo principal está correto: `app/main.py`
-
-6. **Modelos de ML não encontrados:**
-   - Execute `python models/modelo.py` localmente antes do deploy
-   - Certifique-se de que os arquivos `.pkl` estão sendo gerados
-   - Verifique se o `.gitignore` não está excluindo os modelos necessárioso
-
-O **Decision** é uma aplicação inteligente de recrutamento que utiliza Machine Learning para fazer matching entre candidatos e vagas de emprego. O sistema possui modelos especializados por tecnologia (Python, Java, SQL, AWS, Azure, SAP, React, Oracle) e um modelo geral como fallback, proporcionando alta precisão na recomendação de candidatos.
+O **Decision** é uma aplicação inteligente de recrutamento que utiliza Machine Learning para prever a compatibilidade entre candidatos e vagas. O sistema usa um **modelo semântico unificado**, baseado em *embeddings* de texto (SBERT) e um algoritmo de Gradient Boosting (XGBoost), para analisar o contexto completo de currículos e descrições de vagas, gerando um score de afinidade preciso.
 
 Desenvolvido como solução para o Datathon Data Analytics da Decision, esta ferramenta de IA é focada em duas frentes: a **priorização estratégica de candidatos** para vagas abertas e a **descoberta de perfis de sucesso** com base em dados históricos, visando tornar o processo de seleção mais rápido, assertivo e data-driven.
 
 ## Funcionalidades
 
-- **Matching Inteligente**: Algoritmos de ML especializados por área de tecnologia
-- **Análise Semântica**: Processamento de linguagem natural para análise de currículos e descrições de vagas
-- **Modelos Especializados**: 8 modelos específicos para diferentes tecnologias
-- **Interface Streamlit**: Interface web intuitiva e responsiva
-- **SHAP Explainability**: Visualizações de interpretabilidade dos modelos
-- **Containerização Docker**: Deploy simplificado
+- **Matching Semântico**: Análise de compatibilidade baseada no significado e contexto dos textos, e não apenas em palavras-chave.
+- **Modelo de ML Unificado**: Um único e robusto modelo XGBoost que aprende com embeddings de texto e features de engenharia.
+- **Análise de Requisitos**: Avaliação de compatibilidade de níveis de senioridade, idiomas e localização.
+- **Interface Streamlit**: Interface web intuitiva para análise de vagas e candidatos.
+- **Visualização de Dados**: Gráficos para análise de importância de features e performance do modelo.
+- **Containerização Docker**: Deploy simplificado e reproduzível.
 
 ## Arquitetura do Projeto
 
@@ -64,42 +33,36 @@ Datathon/
 │   │   └── prospects.json     # Dados de prospects
 │   └── processed/             # Dados processados
 ├── models/                    # Modelos de Machine Learning
-│   ├── modelo_*.pkl           # Modelos especializados por tecnologia
-│   ├── modelo.py              # Script de treinamento
-│   ├── models_manifest.json   # Manifesto dos modelos
-│   └── shap_summary_*.png     # Visualizações SHAP
+│   ├── modelo_treinado*.pkl   # Modelos especializados por tecnologia
+│   └── modelo.py              # Script de treinamento
 ├── notebooks/                 # Análises exploratórias
 │   ├── eda_applicants.ipynb   # EDA dos candidatos
 │   ├── eda_jobs.ipynb         # EDA das vagas
 │   └── eda_prospects.ipynb    # EDA dos prospects
-├── src/                       # Código fonte adicional
 ├── Dockerfile                 # Configuração Docker
 ├── requirements.txt           # Dependências Python
 └── README.md                  # Este arquivo
 ```
 
-## Modelos Especializados
+## Arquitetura do Modelo
 
-O sistema conta com os seguintes modelos especializados:
+O sistema abandonou a abordagem de múltiplos modelos por tecnologia em favor de um **modelo semântico unificado**, que se mostrou mais flexível e poderoso. A arquitetura funciona da seguinte forma:
 
-1. **Python** - Para vagas relacionadas a Python, Django, Flask, Data Science
-2. **Java** - Para vagas relacionadas a Java, Spring, Hibernate
-3. **SQL** - Para vagas relacionadas a bancos de dados e SQL
-4. **AWS** - Para vagas relacionadas a Amazon Web Services
-5. **Azure** - Para vagas relacionadas a Microsoft Azure
-6. **SAP** - Para vagas relacionadas a sistemas SAP
-7. **React** - Para vagas relacionadas a React e frontend
-8. **Oracle** - Para vagas relacionadas a tecnologias Oracle
-9. **General** - Modelo fallback para outras tecnologias
+1.  **Engenharia de Features**: Dados como nível de senioridade, idiomas e localização são extraídos e comparados.
+2.  **Embeddings de Texto**: Os textos completos da vaga e do currículo são convertidos em vetores numéricos (embeddings) usando o modelo **SBERT (`paraphrase-MiniLM-L6-v2`)**. Isso permite que o modelo entenda o significado semântico dos textos.
+3.  **Modelo Preditivo**: Os vetores de embeddings e as features de engenharia são combinados para treinar um classificador **XGBoost**, que prevê a probabilidade de um "match" de sucesso.
+4.  **Balanceamento de Classes**: A técnica **SMOTE** é usada durante o treinamento para lidar com o desbalanceamento entre candidatos contratados e não contratados.
+
+Esta abordagem permite que o modelo generalize para qualquer tipo de vaga, incluindo tecnologias novas que não estavam nos dados de treino originais.
 
 ## Tecnologias Utilizadas
 
 - **Python 3.12+**
 - **Streamlit** - Interface web
 - **XGBoost** - Algoritmo de Machine Learning
-- **spaCy** - Processamento de linguagem natural
-- **NLTK** - Toolkit de linguagem natural
-- **SHAP** - Explicabilidade dos modelos
+- **Sentence-Transformers (SBERT)** - Processamento de linguagem natural e embeddings
+- **NLTK** - Toolkit de linguagem natural (para stopwords)
+- **Imbalanced-learn** - Para balanceamento de classes (SMOTE)
 - **Pandas/NumPy** - Manipulação de dados
 - **Scikit-learn** - Ferramentas de ML
 - **Docker** - Containerização
@@ -114,178 +77,78 @@ O sistema conta com os seguintes modelos especializados:
 
 ### Instalação Local
 
-1. **Clone o repositório:**
-```bash
-git clone https://github.com/maykonalves/Datathon.git
-cd Datathon
-```
+1.  **Clone o repositório:**
+    ```bash
+    git clone [https://github.com/maykonalves/Datathon.git](https://github.com/maykonalves/Datathon.git)
+    cd Datathon
+    ```
 
-2. **Crie um ambiente virtual:**
-```bash
-python -m venv venv
-source venv/bin/activate  # Linux/Mac
-# ou
-venv\Scripts\activate     # Windows
-```
+2.  **Crie um ambiente virtual:**
+    ```bash
+    python -m venv venv
+    source venv/bin/activate  # Linux/Mac
+    # ou
+    venv\Scripts\activate     # Windows
+    ```
 
-3. **Instale as dependências:**
-```bash
-pip install -r requirements.txt
-```
+3.  **Instale as dependências:**
+    ```bash
+    pip install -r requirements.txt
+    ```
+    *Nota: A primeira execução irá baixar os modelos de embedding do Sentence-Transformers, o que pode levar alguns minutos.*
 
-4. **Baixe o modelo spaCy em português:**
-```bash
-python -m spacy download pt_core_news_sm
-```
+4.  **Execute o treinamento do modelo:**
+    ```bash
+    python models/modelo.py
+    ```
 
-5. **Execute o treinamento dos modelos (se necessário):**
-```bash
-cd models
-python modelo.py
-```
-
-6. **Execute a aplicação:**
-```bash
-streamlit run app/main.py
-```
+5.  **Execute a aplicação:**
+    ```bash
+    streamlit run app/main.py
+    ```
 
 ### Instalação com Docker
 
-1. **Build da imagem:**
-```bash
-docker build -t decision-app .
-```
+1.  **Build da imagem:**
+    ```bash
+    docker build -t decision-app .
+    ```
 
-2. **Execute o container:**
-```bash
-docker run -p 8501:8501 decision-app
-```
+2.  **Execute o container:**
+    ```bash
+    docker run -p 8501:8501 decision-app
+    ```
 
-### Deploy no Streamlit Cloud
-
-Para fazer deploy no Streamlit Cloud, siga estes passos:
-
-1. **Fork/Clone este repositório no GitHub**
-
-2. **Acesse [share.streamlit.io](https://share.streamlit.io)**
-
-3. **Configure o deploy:**
-   - Repository: `seu-usuario/Datathon`
-   - Branch: `main`
-   - Main file path: `app/main.py`
-
-4. **Arquivos importantes para o deploy:**
-   - `requirements.txt` - Dependências Python
-   - `packages.txt` - Dependências do sistema
-   - `.streamlit/config.toml` - Configuração do Streamlit
-
-5. **O sistema irá automaticamente:**
-   - Instalar todas as dependências
-   - Baixar o modelo spaCy português
-   - Configurar o ambiente de produção
-
-**Nota:** O modelo spaCy está incluído diretamente no `requirements.txt` para evitar problemas de permissão durante o deploy.
-
-A aplicação estará disponível em `http://localhost:8501` (local) ou na URL fornecida pelo Streamlit Cloud.
+A aplicação estará disponível em `http://localhost:8501`.
 
 ## Como Usar
 
 ### Página de Match
 
-1. Acesse a aplicação no navegador
-2. Navegue para "Match perfil"
-3. Selecione uma vaga disponível no sistema
-4. O sistema irá:
-   - Identificar automaticamente a tecnologia principal da vaga
-   - Selecionar o modelo especializado apropriado
-   - Calcular scores de matching para todos os candidatos
-   - Exibir os candidatos ranqueados por compatibilidade
+1.  Acesse a aplicação e navegue para "Match Análise".
+2.  Preencha as informações da vaga e do candidato nos campos da tela.
+3.  Clique em "Calcular Match".
+4.  O sistema irá processar os dados, gerar as features e embeddings, e exibir um score de afinidade.
 
 ### Interpretação dos Resultados
 
-- **Score de Match**: Probabilidade de sucesso (0-100%)
-- **Modelo Utilizado**: Qual modelo especializado foi aplicado
-- **Features Principais**: Principais fatores que influenciaram o score
-
-## Desenvolvimento e Contribuição
-
-### Estrutura do Código
-
-- `app/main.py`: Configuração principal do Streamlit
-- `app/pages/match.py`: Lógica de matching e interface
-- `models/modelo.py`: Script de treinamento dos modelos
-- `notebooks/`: Análises exploratórias e desenvolvimento
-
-### Executando os Notebooks
-
-Para executar as análises exploratórias:
-
-```bash
-jupyter lab notebooks/
-```
-
-### Retreinamento dos Modelos
-
-Para retreinar os modelos com novos dados:
-
-```bash
-cd models
-python modelo.py
-```
-
-## Métricas e Performance
-
-Os modelos são avaliados usando:
-- **Accuracy**
-- **Precision/Recall**
-- **F1-Score**
-- **Cross-validation** com StratifiedKFold
-
-Visualizações SHAP são geradas automaticamente para interpretabilidade.
-
-## Deploy
-
-### Dockerfile
-
-O projeto inclui um Dockerfile otimizado para produção:
-- Baseado em Python 3.12 slim
-- Health check integrado
-- Exposição na porta 8501
-- Configuração para servidor público
-
-### Variáveis de Ambiente
-
-Nenhuma variável de ambiente específica é necessária para execução básica.
+-   **Score de Afinidade**: Probabilidade de sucesso (0-100%) calculada pelo modelo.
+-   **Análise Detalhada**: Um resumo simplificado de requisitos-chave (nível profissional, idioma) para feedback rápido.
 
 ## Troubleshooting
 
 ### Problemas Comuns
 
-1. **Modelo spaCy não encontrado:**
-   ```bash
-   python -m spacy download pt_core_news_sm
-   ```
+1.  **Erro de modelo não encontrado (`.pkl`):**
+    -   Certifique-se de ter executado o script `python models/modelo.py` para treinar e salvar o modelo.
 
-2. **Erro de modelos não encontrados:**
-   - Execute `python models/modelo.py` para treinar os modelos
+2.  **Problemas de dependências:**
+    -   Verifique se está usando Python 3.12+.
+    -   Recrie seu ambiente virtual e reinstale as dependências: `pip install -r requirements.txt --force-reinstall`
 
-3. **Problemas de dependências:**
-   - Verifique se está usando Python 3.12+
-   - Reinstale as dependências: `pip install -r requirements.txt --force-reinstall`
+3.  **Erro no download do modelo de embedding:**
+    -   Verifique sua conexão com a internet. A biblioteca `sentence-transformers` precisa baixar modelos do Hugging Face na primeira vez que é usada.
 
 ## Licença
 
-Este projeto está sob a licença MIT. Veja o arquivo [LICENSE](LICENSE) para mais detalhes.
-
-## Equipe
-
-Desenvolvido durante o Datathon por **Maykon Alves**.
-
-## Contato
-
-- GitHub: [@maykonalves](https://github.com/maykonalves)
-- LinkedIn: [Maykon Alves](https://linkedin.com/in/maykonalves)
-
----
-
-**Decision** - Transformando recrutamento com Inteligência Artificial
+Este projeto está sob a licença MIT.
